@@ -160,13 +160,12 @@ func main() {
 	slog.Info("acquired instance lock", "path", instanceLock.Path())
 
 	if _, err := os.Stat(configPath); os.IsNotExist(err) {
-		if err := bootstrapConfig(configPath); err != nil {
-			fmt.Fprintf(os.Stderr, "Error creating config: %v\n", err)
+		fmt.Println("No config file found. Launching setup wizard...")
+		fmt.Println()
+		runSetup([]string{"--config-path", configPath})
+		if _, err := os.Stat(configPath); os.IsNotExist(err) {
 			os.Exit(1)
 		}
-		fmt.Printf("Created default config at %s\n", configPath)
-		fmt.Println("Please edit this file to add your agent and platform credentials, then run cc-connect again.")
-		os.Exit(0)
 	}
 
 	cfg, err := config.Load(configPath)
@@ -1008,38 +1007,6 @@ func resolveConfigPath(explicit string) string {
 		return filepath.Join(home, ".cc-connect", "config.toml")
 	}
 	return "config.toml"
-}
-
-func bootstrapConfig(path string) error {
-	if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
-		return err
-	}
-
-	const tmpl = `# CC2Wechat configuration
-# Docs: https://github.com/18haventgirl/CC2Wechat
-# Or run: cc-connect setup
-
-[log]
-level = "info"
-
-[[projects]]
-name = "default"
-
-[projects.agent]
-type = "claudecode"
-
-[projects.agent.options]
-# binary_path = "C:\\Users\\pc\\AppData\\Roaming\\npm\\claude.cmd"
-# mode = "default"
-
-[[projects.platforms]]
-type = "weixin"
-
-[projects.platforms.options]
-token = "YOUR_ILINK_BOT_TOKEN"
-# allow_from = "*"
-`
-	return os.WriteFile(path, []byte(tmpl), 0o644)
 }
 
 func printUsage() {
