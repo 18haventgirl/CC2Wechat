@@ -5,6 +5,8 @@
 cc-connect.bak-*
 *.exe
 *.exe~
+cc-connect-darwin-*
+cc-connect-linux-*
 *.dll
 *.so
 *.dylib
