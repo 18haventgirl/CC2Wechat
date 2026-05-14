@@ -1015,35 +1015,29 @@ func bootstrapConfig(path string) error {
 		return err
 	}
 
-	const tmpl = `# cc-connect configuration
-# Docs: https://github.com/chenhg5/cc-connect
+	const tmpl = `# CC2Wechat configuration
+# Docs: https://github.com/18haventgirl/CC2Wechat
+# Or run: cc-connect setup
 
 [log]
 level = "info"
 
 [[projects]]
-name = "my-project"
+name = "default"
 
 [projects.agent]
-type = "claudecode"   # "claudecode", "codex", "cursor", "gemini", "qoder", "opencode", or "iflow"
+type = "claudecode"
 
 [projects.agent.options]
-work_dir = "/path/to/your/project"
-mode = "default"
-# model = "claude-sonnet-4-20250514"
+# binary_path = "C:\\Users\\pc\\AppData\\Roaming\\npm\\claude.cmd"
+# mode = "default"
 
-# --- Choose at least one platform below ---
-
-# Feishu / Lark (WebSocket, no public IP needed)
 [[projects.platforms]]
-type = "feishu"
+type = "weixin"
 
 [projects.platforms.options]
-app_id = "your-feishu-app-id"
-app_secret = "your-feishu-app-secret"
-
-# For more platforms (DingTalk, Telegram, Slack, Discord, LINE, WeChat Work)
-# see: https://github.com/chenhg5/cc-connect/blob/main/config.example.toml
+token = "YOUR_ILINK_BOT_TOKEN"
+# allow_from = "*"
 `
 	return os.WriteFile(path, []byte(tmpl), 0o644)
 }
@@ -1066,8 +1060,8 @@ func printUsage() {
 
   Connect Claude Code to WeChat.
 
-  GitHub:  https://github.com/chenhg5/cc-connect
-  Docs:    https://github.com/chenhg5/cc-connect/blob/main/INSTALL.md
+  GitHub:  https://github.com/18haventgirl/CC2Wechat
+  Docs:    https://github.com/18haventgirl/CC2Wechat/blob/main/INSTALL.md
 
 Usage:
   cc-connect [flags]
