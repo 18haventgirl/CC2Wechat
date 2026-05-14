@@ -830,6 +830,7 @@ func main() {
 	}
 
 	slog.Info("cc-connect is running", "projects", len(engines))
+	fmt.Println("cc-connect is running. Waiting for WeChat messages. Press Ctrl+C to stop.")
 
 	// After startup, check if we were restarted and send success notification
 	if notify := core.ConsumeRestartNotify(cfg.DataDir); notify != nil {
