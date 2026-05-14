@@ -1,0 +1,31 @@
+# cc-connect -- Claude Code + WeChat
+# Config location: ~/.cc-connect/config.toml
+# Generate with: cc-connect setup
+
+language = "zh-CN"
+data_dir = "~/.cc-connect/data"
+
+# Optional: configure a custom AI provider for Claude Code
+# [[providers]]
+# name = "my-key"
+# api_key = "${ANTHROPIC_API_KEY}"
+# agent_types = ["claudecode"]
+
+[[projects]]
+name = "default"
+
+[projects.agent]
+type = "claudecode"
+[projects.agent.options]
+# binary_path = "/usr/local/bin/claude"
+# model = "claude-sonnet-4-6"
+
+[[projects.platforms]]
+type = "weixin"
+[projects.platforms.options]
+token = "${WEIXIN_BOT_TOKEN}"
+# allow_from = "*"
+# account_id = "default"
+
+[log]
+level = "info"
