@@ -10,8 +10,6 @@ import (
 	"runtime"
 	"strings"
 	"time"
-
-	"github.com/chenhg5/cc-connect/daemon"
 )
 
 func runSetup(args []string) {
@@ -19,7 +17,6 @@ func runSetup(args []string) {
 	token := fs.String("token", "", "existing WeChat iLink Bot token (skip QR scan)")
 	allowFrom := fs.String("allow-from", "", "allowed WeChat user IDs (comma-separated, * for all)")
 	claudePath := fs.String("claude-path", "", "path to claude binary")
-	noDaemon := fs.Bool("no-daemon", false, "skip daemon installation")
 	configPath := fs.String("config-path", "", "custom config file path")
 	force := fs.Bool("force", false, "overwrite existing config without prompting")
 	_ = fs.Parse(args)
@@ -32,7 +29,7 @@ func runSetup(args []string) {
 	fmt.Println()
 
 	// Step 1: Detect Claude Code
-	fmt.Println("[1/4] Detecting Claude Code...")
+	fmt.Println("[1/3] Detecting Claude Code...")
 	claudeBin := *claudePath
 	if claudeBin == "" {
 		claudeBin = detectClaudeCode()
@@ -55,7 +52,7 @@ func runSetup(args []string) {
 	fmt.Println()
 
 	// Step 2: WeChat connection via QR scan
-	fmt.Println("[2/4] Configuring WeChat connection...")
+	fmt.Println("[2/3] Configuring WeChat connection...")
 	var (
 		botToken  string
 		accountID string
@@ -123,7 +120,7 @@ func runSetup(args []string) {
 	fmt.Println()
 
 	// Step 3: Generate config
-	fmt.Println("[3/4] Generating configuration...")
+	fmt.Println("[3/3] Generating configuration...")
 	cfgDir := configDir()
 	cfgFile := *configPath
 	if cfgFile == "" {
@@ -196,62 +193,10 @@ level = "info"
 	fmt.Printf("  Config written to %s\n", cfgFile)
 	fmt.Println()
 
-	// Step 4: Daemon installation
-	fmt.Println("[4/4] System service...")
-	if *noDaemon {
-		fmt.Println("  Skipped (--no-daemon).")
-		fmt.Println()
-		printFinish(cfgFile)
-		return
-	}
-
-	if interactive {
-		fmt.Print("Install as system service (auto-start on login)? [Y/n]: ")
-		scanner := bufio.NewScanner(os.Stdin)
-		if scanner.Scan() {
-			answer := strings.ToLower(strings.TrimSpace(scanner.Text()))
-			if answer == "n" || answer == "no" {
-				fmt.Println("  Skipped.")
-				fmt.Println()
-				printFinish(cfgFile)
-				return
-			}
-		}
-	}
-
-	mgr, err := daemon.NewManager()
-	if err != nil {
-		fmt.Println("  Service management not supported on this platform.")
-		fmt.Println()
-		printFinish(cfgFile)
-		return
-	}
-
-	dcfg := daemon.Config{
-		WorkDir: cfgDir,
-	}
-	if err := daemon.Resolve(&dcfg); err != nil {
-		fmt.Fprintf(os.Stderr, "  Error resolving daemon config: %v\n", err)
-		os.Exit(1)
-	}
-
-	if err := mgr.Install(dcfg); err != nil {
-		fmt.Fprintf(os.Stderr, "  Error installing service: %v\n", err)
-	} else {
-		if err := daemon.SaveMeta(&daemon.Meta{
-			LogFile:     dcfg.LogFile,
-			LogMaxSize:  dcfg.LogMaxSize,
-			WorkDir:     dcfg.WorkDir,
-			BinaryPath:  dcfg.BinaryPath,
-			InstalledAt: daemon.NowISO(),
-		}); err != nil {
-			fmt.Fprintf(os.Stderr, "  Warning: failed to save metadata: %v\n", err)
-		}
-		fmt.Printf("  Service installed (%s).\n", mgr.Platform())
-	}
-
+	fmt.Println(strings.Repeat("=", 52))
+	fmt.Println("  Setup complete! Starting cc-connect...")
+	fmt.Println(strings.Repeat("=", 52))
 	fmt.Println()
-	printFinish(cfgFile)
 }
 
 func detectClaudeCode() string {
@@ -302,17 +247,3 @@ func configDir() string {
 	return filepath.Join(home, ".cc-connect")
 }
 
-func printFinish(cfgFile string) {
-	fmt.Println(strings.Repeat("=", 52))
-	fmt.Println("  Setup complete!")
-	fmt.Println()
-	fmt.Printf("  Config: %s\n", cfgFile)
-	fmt.Printf("  Start:  cc-connect --config %s\n", cfgFile)
-	fmt.Println()
-	fmt.Println("  Useful commands:")
-	fmt.Println("    cc-connect daemon start        Start the service")
-	fmt.Println("    cc-connect daemon stop         Stop the service")
-	fmt.Println("    cc-connect daemon status       Check service status")
-	fmt.Println("    cc-connect daemon logs         View logs")
-	fmt.Println(strings.Repeat("=", 52))
-}
