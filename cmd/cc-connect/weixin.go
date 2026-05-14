@@ -254,8 +254,11 @@ func runWeixinQRLoginFlow(opts weixinQRLoginOptions) (*weixinQRLoginResult, erro
 		botType = defaultWeixinBotType
 	}
 
+	fmt.Println("Fetching QR code from iLink API...")
+	fetchCtx, fetchCancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer fetchCancel()
 	ctx := context.Background()
-	qrPayload, err := weixinFetchBotQRCode(ctx, opts.APIBaseURL, botType, opts.RouteTag, opts.Debug)
+	qrPayload, err := weixinFetchBotQRCode(fetchCtx, opts.APIBaseURL, botType, opts.RouteTag, opts.Debug)
 	if err != nil {
 		return nil, err
 	}
