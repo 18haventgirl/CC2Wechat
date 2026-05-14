@@ -88,8 +88,8 @@ func runSetup(args []string) {
 			accountID = "default"
 		default:
 			fmt.Println()
-			fmt.Println("  A QR code will appear below. Scan it with your WeChat app.")
-			fmt.Println("  Waiting for scan (timeout: 8 minutes)...")
+			fmt.Println("  Connecting to WeChat iLink API...")
+			fmt.Println("  If this hangs, check your network (needs access to ilinkai.weixin.qq.com).")
 			fmt.Println()
 
 			res, err := runWeixinQRLoginFlow(weixinQRLoginOptions{
@@ -99,8 +99,8 @@ func runSetup(args []string) {
 			})
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "\nError: QR login failed: %v\n", err)
-				fmt.Fprintln(os.Stderr, "Tip: you can retry with: cc-connect setup")
-				fmt.Fprintln(os.Stderr, "     or use an existing token: cc-connect setup --token <token>")
+				fmt.Fprintln(os.Stderr, "Tip: check that ilinkai.weixin.qq.com is accessible from your network.")
+				fmt.Fprintln(os.Stderr, "     Or use an existing token: cc-connect setup --token <token>")
 				os.Exit(1)
 			}
 			botToken = res.BotToken
