@@ -235,14 +235,6 @@ func getClaudeVersion(path string) string {
 }
 
 func configDir() string {
-	if runtime.GOOS == "windows" {
-		appData := os.Getenv("APPDATA")
-		if appData == "" {
-			home, _ := os.UserHomeDir()
-			appData = filepath.Join(home, "AppData", "Roaming")
-		}
-		return filepath.Join(appData, ".cc-connect")
-	}
 	home, _ := os.UserHomeDir()
 	return filepath.Join(home, ".cc-connect")
 }
